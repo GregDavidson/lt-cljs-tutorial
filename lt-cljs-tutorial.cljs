@@ -6,14 +6,17 @@
 ;; Basics
 ;; ============================================================================
 
+;; Note: Macintosh users should use Command- where we say Control-
+
 ;; To begin, open the command pane (type Control-SPACE), Add Connection, select
-;; Light Table UI. Once connected you can evaluate all the forms in this file
-;; by placing the cursor after the form and typing Command-ENTER.
+;; Light Table UI. Once connected you can evaluate the forms in this file
+;; by placing the cursor after the form and typing Control-ENTER.
 
-;; IMPORTANT: You must evaluate the very first form, the namespace
-;; definition.
+;; IMPORTANT: You must evaluate the very first form (ns ...) below.  A form is
+;; a parenthesized expression and ns creates a namespace, in this case
+;; a namespace called `lt-cljs-tutorial'.
 
-;; Declaring a namespaces
+;; Declaring a namespace
 ;; ----------------------------------------------------------------------------
 
 ;; ClojureScript supports modularity via namespaces. They allow you to group
@@ -22,13 +25,13 @@
 (ns lt-cljs-tutorial
   (:require [clojure.string :as string]))
 
-;; :require is how you can import functionality from a different namespace into
-;; the current one. Here we are requiring `clojure.string` and giving it an
-;; alias. We could write the following:
+;; The (:require ...) sub-expression imports definitions from a different
+;; namespace into the current one. Here we are requiring the `clojure.string`
+;; namespace and giving it the alias `string'. We could write the following:
 
 (clojure.string/blank? "")
 
-;; But that's really verbose compared to:
+;; But that's verbose compared to:
 
 (string/blank? "")
 
@@ -41,8 +44,8 @@
 ;; now.
 
 ;; The second way is by preceding a form with `#_`. This causes ClojureScript
-;; to skip the evaluation of only the form immediately following, without
-;; affecting the evaluation of the surrounding forms.
+;; to skip the evaluation of that complete immediately following form,
+;; without affecting the evaluation of any surrounding forms.
 
 ;; Try to reveal the secret message below:
 
@@ -54,7 +57,7 @@
 ;; source.
 
 ;; For example, try placing your cursor after the last `)` below and type
-;; Command-ENTER:
+;; Control-ENTER:
 
 (comment
 
@@ -63,7 +66,7 @@
   )
 
 ;; The `comment` macro makes the whole form return `nil`. Now go back and
-;; highlight just the middle line, then type Command-ENTER. In this way
+;; highlight just the middle line, then type Control-ENTER. In this way
 ;; you can include code samples or quick tests in-line with the rest of
 ;; your code.
 
@@ -74,7 +77,7 @@
 ;; Once you have a namespace, you can start creating top level definitions in
 ;; that namespace.
 
-;; You can define a top level with `def`.
+;; You can define a top level definition with `def`.
 
 (def x 1)
 
@@ -129,16 +132,16 @@ lt-cljs-tutorial/x
 ;; Function literals
 ;; ----------------------------------------------------------------------------
 
-;; ClojureScript also supports a shorthand function literal which is useful
-;; You can use the % and %N placeholders to represent function arguments.
+;; ClojureScript also supports a shorthand function literal which can be handy,
+;; you use the % and %N placeholders to represent function arguments.
 
-;; You should not abuse the function literal notation as it degrades readability
-;; outside of simple cases. It is nice for simple functional cases such as
-;; the following. You could map over a ClojureScript vector like this:
+;; You should not use the function literal notation outside of very simple
+;; cases lest it degrade readability. It is nice for simple functional cases
+;; such as mapping over a ClojureScript vector like this:
 
 (map (fn [n] (* n 2)) [1 2 3 4 5])
 
-;; Or you can save typing a few characters like this:
+;; Which with the shorthand looks like this:
 
 (map #(* % 2) [1 2 3 4 5])
 
@@ -163,8 +166,9 @@ lt-cljs-tutorial/x
 
 (def another-object #js {"foo" "bar"})
 
-;; It's important to note that `#js` is shallow, the contents of `#js` will be
-;; ClojureScript data unless preceded by `#js`.
+;; It's important to note that `#js` is shallow, i.e. any contents of a
+;; JavaScript array or object introduced by `#js` will be ClojureScript
+;; data unless those expressions are also preceded by `#js`.
 
 ;; This is a mutable JavaScript object with an immutable ClojureScript vector
 ;; inside.
@@ -175,10 +179,10 @@ lt-cljs-tutorial/x
 ;; Constructing a type
 ;; ----------------------------------------------------------------------------
 
-;; Of course some JavaScript data types you will want to create with a
-;; constructor.
+;; You will want to create some JavaScript data types with a
+;; JavaScript constructor.
 
-;; (js/Date.) is equivalent to new Date().
+;; (js/Date.) is equivalent to the JavaScript expression: new Date()
 
 (def a-date (js/Date.))
 
@@ -188,9 +192,9 @@ lt-cljs-tutorial/x
 
 (def another-regexp (js/RegExp. "\\d{3}-?\\d{3}-?\\d{4}"))
 
-;; Handy
+;; Access to JavaScript "global" definitions
 
-;; NOTE: js/Foo is how you refer to global JavaScript entities of any kind.
+;; js/Foo accesses the global JavaScript entity named `Foo'
 
 js/Date
 
@@ -198,16 +202,15 @@ js/RegExp
 
 js/requestAnimationFrame
 
-;; If you're curious about other JavaScript interop jump to the bottom of this
-;; tutorial.
-
+;; More Clojure/JavaScript interoperation features are covered
+;; at the bottom of this tutorial.
 
 ;; ClojureScript data types
 ;; ============================================================================
 
 ;; Unless there is a good reason, you should generally write your ClojureScript
 ;; programs with ClojureScript data types. They have many advantages over
-;; JavaScript data types - they present a uniform API and they are immutable.
+;; JavaScript data types: they present a uniform API and they are immutable.
 
 ;; Vectors
 ;; ----------------------------------------------------------------------------
@@ -268,7 +271,7 @@ another-vector
 ;; Maps
 ;; ----------------------------------------------------------------------------
 
-;; Along with vectors, maps are the most common data type in ClojureScript.
+;; Along with vectors, maps are the most common collection type in ClojureScript.
 ;; Map usage is analogous to the usage of Object in JavaScript, but
 ;; ClojureScript maps are immutable and considerably more flexible.
 
@@ -378,7 +381,7 @@ a-map
 (identity ::foo)
 
 ;; What good is this for? It allows you to put data into collections without
-;; fear of namespace clashes without the tedium of manual namespacing them
+;; fear of namespace clashes without the tedium of manually namespacing them
 ;; in your source.
 
 (identity {:user/foo ::foo})
@@ -492,6 +495,7 @@ a-list
 
 (identical? my-vec your-vec)
 
+;; Using identical? is not considered good functional style!
 
 ;; Control
 ;; ============================================================================
@@ -591,7 +595,7 @@ a-list
 (into [] (range 10))
 
 
-;; Moar functions
+;; Moar [sic?] functions
 ;; ============================================================================
 
 ;; Functions are the essence of any significant ClojureScript program, so
@@ -636,7 +640,7 @@ a-list
 (apply + [1 2 3 4 5])
 
 
-;; multimethods
+;; Multimethods
 ;; ----------------------------------------------------------------------------
 
 ;; Often when you need some polymorphism, and performance isn't an issue,
@@ -675,10 +679,10 @@ a-list
 (defmulti parse (fn [[f & r :as form]] f))
 
 (defmethod parse 'if
-  [form] {:op :if})
+  [form] {:op :if :test (nth form 1) :then (nth form 2) :else (get form 3 nil)})
 
 (defmethod parse 'let
-  [form] {:op :let})
+  [form] {:op :let :bindings (nth form 1) :body (rest (rest form))})
 
 (parse '(if a b c))
 (parse '(let [x 1] x))
@@ -702,7 +706,7 @@ some-x
 
 ;; Could a language with such a name miss closures? Surely it can't. You
 ;; may be already familiar with them in JavaScript, even if it's a
-;; variable scoped language.
+;; variable scoped [huh?] language.
 
 (let [a 1e3]
   (defn foo []
@@ -714,8 +718,7 @@ some-x
 ;; `let` form and they both know about `a` (i.e. they close over `a`)
 ;; Note, even if defined inside a `let`, `foo` and `bar` are available
 ;; in the outer scope. This is because all `def` expressions are always
-;; top level. See the footnote at the end of this section.
-
+;; namespace level. See the footnote at the end of this section.
 
 (foo)
 (bar)
@@ -729,7 +732,7 @@ some-x
   )
 
 ;; That's why some people say that closures are the poor man's objects.
-;; They encapsulate the information as well.
+;; They encapsulate information much as objects do.
 
 ;; But in ClojureScript, functions' parameters and let bindings' locals
 ;; are not mutable! That goes for loop locals, too!
@@ -740,11 +743,12 @@ some-x
               ret))]
   (map #(%) fns))
 
+;;;; [[ How many people do you expect to be able to understand
+;;;;   this example? I think you need to build it up more gradually! ]]
 ;; In JavaScript you would see a list of ten 9s. In ClojureScript we
 ;; see the expected numbers from 0 to 9.
 
-;; FOOTNOTE:
-;;
+;; NOTE:
 ;; `def` expressions (including `defn`) are always top level. People familiar
 ;; with Scheme or other Lisps often mistakenly write the following in Clojure:
 
@@ -785,15 +789,14 @@ some-x
 (let [[r g b] [255 255 150]]
   g)
 
-;; _ is just a convention for saying that you are not interested at the
-;; item in the corresponding position. it has no other special meaning.
-;; Here we're only interested at the third local variable named `b`.
+;; _ is a convention for ignoring the item in the corresponding position.
+;; If we're only interested in binding the third value:
 
 (let [[_ _ b] [255 255 150]]
   b)
 
-;; destructuring function arguments works just as well. Here we are
-;; only intersted at the second argument `g`.
+;; destructuring function arguments works the same. Here we are
+;; only interested in the second argument `g`.
 
 (defn green [[_ g _]] g)
 
@@ -804,13 +807,13 @@ some-x
 ;; ----------------------------------------------------------------------------
 
 ;; Map destructuring is also useful. Here we destructure the value for the
-;; `:foo` key and bind it to a local `f`, and the value for `:baz` key
+;; `:foo` key and bind it to a local `f`, and the value for key `:baz`
 ;; and bind it to a local `b`.
 
 (let [{f :foo b :baz} {:foo "bar" :baz "woz"}]
   [f b])
 
-;; If we don't want to rename, we can just use `:keys`.
+;; If we don't want to rename, we can use `:keys`.
 
 (let [{:keys [first last]} {:first "Bob" :last "Smith"}]
   [first last])
@@ -883,9 +886,9 @@ some-x
 ;; List comprehensions
 ;; ----------------------------------------------------------------------------
 
-;; ClojureScript supports the list comprehensions you might know from various
-;; languages. List comprehensions are sometimes more natural or more readable
-;; than a chain of `map` and `filter` operations.
+;; ClojureScript supports list comprehensions, as do a few other modern
+;; languages. List comprehensions are sometimes more natural or more
+;; readable than a chain of `map` and `filter` operations.
 
 (for [x (range 1 10)
       y (range 1 10)]
@@ -1017,9 +1020,9 @@ some-x
 
 (deref x)
 
-;; If you want to change the value of an atom you can use `reset!` which returns
-;; the new value. It's idiomatic to add the bang char `!` at the end of function
-;; names mutating objects.
+;; to change the value of an atom use `reset!` which returns
+;; the new value. It's idiomatic to use names ending with `!`
+;; (bang or exclamation mark) for functions which mutate objects.
 
 (reset! x 2)
 
@@ -1030,11 +1033,11 @@ x
 ;; swap!
 ;; ------------------------------------------------------------------------------
 
-;; If you want to change the value of an atom on the basis of its current value,
-;; you can use `swap!`. In its simplest form `swap!` accept as first argument
-;; the atom itself and as a second argument an updating function of one argument
-;; which will be instantiated with the current value of the atom. `swap!` returns
-;; the new value of the atom.
+;; To change the value of an atom based on its current value use `swap!`.
+;; In its simplest form `swap!` accepts two arguments, the atom itself
+;; and an updating function.  The updating function will be called with
+;; the current value of the atom and returns a new value for the atom.
+;;  `swap!` assigns and returns the new value of the atom.
 
 (swap! x inc)
 
@@ -1042,9 +1045,8 @@ x
 
 @x
 
-;; If your updating function needs extra arguments to calculate the new value, you
-;; have to pass them as extra arguments to `swap!` after the updating function
-;; itself.
+;; If your updating function needs extra arguments to calculate the new value
+;; you can pass them as additional arguments to `swap!`.
 
 (swap! x (fn [old extra-arg]
            (+ old extra-arg)) 39)
@@ -1076,10 +1078,12 @@ x
 (def ctxt (.getContext c "2d"))
 
 ;; We can use property access with `set!` to change the fill color of a
-;; a canvas rendering context.
+;; canvas rendering context.
 
 (set! (.-fillColor ctxt) "#ffffff")
 
+;;;; [[ the change didn't show when I did
+;;;; (.-fillColor ctxt) in LightTable afterwards, it was still nil! ]]
 
 ;; The ClojureScript Standard Library
 ;; ============================================================================
@@ -1089,8 +1093,8 @@ x
 ;; environment, first class namespaces, and Java numerics.
 
 ;; Here are some highlights and patterns that newcomers to ClojureScript might
-;; find useful. Remember you can type Control-Shift-D at anytime to bring up
-;; the documentation panel to see what any of these function do.
+;; find useful. You can type Control-Shift-D at anytime to bring up
+;; the documentation panel to see what any of these functions do.
 
 (apply str (interpose ", " ["Bob" "Mary" "George"]))
 
@@ -1127,7 +1131,7 @@ x
 ;; same uniformity provided by ClojureScript collections can be extended to
 ;; your own types or even types that you do not control!
 
-;; A lot of the uniform power we saw early was because the ClojureScript
+;; A lot of the uniform power we saw earlier is because the ClojureScript
 ;; collections are implemented in terms of protocols. Collections can be
 ;; coerced into sequences because they implement ISeqable. You can use `get`
 ;; on vectors and maps because they implement ILookup.
@@ -1170,9 +1174,9 @@ x
 ;; use extend-protocol for this. extend-protocol simply desugars into multiple
 ;; extend-type forms.
 
-;; As said while learning about `let` special form, when we're not
-;; interested in the value of an argument it's idiomatic to use the
-;; underscore as a placeholder like above.
+;; As we saw with the `let` special form, when we're not
+;; interested in the value of an argument we can use use
+;; underscores as placeholders:
 
 (extend-protocol MyProtocol
   js/Date
@@ -1186,7 +1190,8 @@ x
 
 ;; reify
 ;; ----------------------------------------------------------------------------
-
+;;;; [[ Light Table does not find documentation for reify!
+;;;; Hmm, this is true of several functions from now on! ]]
 ;; Sometimes it's useful to make an anonymous type which implements various
 ;; protocols.
 
@@ -1312,7 +1317,7 @@ x
 
 ;; It's considered idiomatic (and recommended) to define a factory function
 ;; which returns the created instance of a defrecord/deftype. It's idiomatic to use
-;; dash-case for factories names.
+;; dash-case for factories' names.
 
 (defn person [first last]
   (->Person first last))
@@ -1362,10 +1367,10 @@ x
 ;; If you mix types/records with protocols you are modeling your problem with an
 ;; object oriented approach, which is sometimes useful.
 
-;; Note ClojureScript does not offer a direct form of inheritance. Instead,
+;; Note: ClojureScript does not offer a direct form of inheritance. Instead,
 ;; reuse/extension by composition is encouraged. It's best to avoid
 ;; deftype/defrecord and model your problem with plain maps. You can easily
-;; switch to records later on down the line.
+;; switch to records later.
 
 (defrecord Contact [person email])
 
@@ -1419,7 +1424,7 @@ x
 ;; You can access properties with the `.-` property access syntax.
 
 (.-getSeconds a-date)
-
+;;;; [[ LightTable returns a function here, I don't understand! ]]
 
 ;; Method Calls
 ;; ----------------------------------------------------------------------------
